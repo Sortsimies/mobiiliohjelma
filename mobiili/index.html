@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+	
+ 	<meta http-equiv="Content-Security-Policy" content="
+			default-src 'self' 'unsafe-inline' ws://192.168.1.123:3000 http://code.jquery.com https://code.jquery.com  https://ssl.gstatic.com gap: data: blob: filesystem: ; 
+	" />
+	
+	<link rel="stylesheet" href="themes/siniteema.css" />
+  <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" /> 
+	
+	<script
+	src="https://code.jquery.com/jquery-2.1.4.js"
+	integrity="sha256-siFczlgw4jULnUICcdm9gjQPZkw/YPDqhQ9+nAOScE4="
+	crossorigin="anonymous"></script>
+	
+	<script 
+   src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <title>Mobiiliohjelmointi</title>
+
+	
+	<style>
+		[data-role=page]{height: 100% !important; position:relative !important;}
+		[data-role=footer]{bottom:0; position:absolute !important; top: auto !important; width:100%;}
+		
+		
+		.boxRound {
+			border-radius: 15px 50px;
+			background: #73AD21;
+			padding: 0px;
+			width: 100%;
+			height: 170px;
+		}
+		
+		.centerText{
+			text-align:center;
+		}
+		
+		.transparentBG{
+			 background-color: rgba(8,47,67,0.5);
+		}
+	</style>
+</head>
+
+<body>
+
+
+
+
+	<div data-role="panel" id="menupanel" data-display="overlay" data-position="right" data-theme="a" class="transparentBG">
+	<br>
+		<ul data-role="listview" data-inset="true">
+			<li data-icon="home"><a href="#etusivu">Etusivu</a></li>
+			<li data-icon="arrow-r"><a href="#kuvanValinta">Kuvan valinta</a></li>
+			<li data-icon="user"><a href="#tekijat">Tekijät</a></li>
+		</ul><br>
+		<a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-icon-delete ui-btn-icon-right" data-rel="close" style="float:right">Sulje</a>
+	</div>
+	
+
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	<div data-role="page" id="etusivu">
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>360&deg; kuvan katselu</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>
+         
+		<div role="main" class="ui-content ">
+			<div class="boxRound">
+				<br/>
+				<h2 class="centerText">360&deg; kuvan katselu<br>Miikka Alatalo 2016<br>Mobiiliohjelmointi</h2>
+			</div><br>
+			<div class="centerText">
+				<p>Tällä ohjelmalla voit katsoa 360-asteen kuvia puhelimen gyroscopea hyväksikäyttäen.<br>
+				Voit valita kuvan valmiista listasta tai voit myös antaa URL-osoitteen kuvalle.
+				</p>
+				<a href="#kuvanValinta" class="ui-btn ui-corner-all ui-btn-inline ui-icon-arrow-r ui-btn-icon-right">Valitse kuva</a>
+			</div>
+		</div>
+
+		<div data-role="footer">
+			<h1>Mobiiliohjelmointi</h1>
+		</div>
+
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<div data-role="page" id="kuvanValinta">
+	
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>Kuvan valinta</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>   
+
+		<div data-role="main" class="ui-content">	
+		
+			<div class="ui-field-contain">
+			    <label for="select-native-1">Kuvan lähde</label>
+				<select name="alkuKuvanValinta" id="alkuKuvanValinta">
+					<option value="" selected="selected" disabled>Valitse...</option>
+					<option value="lista">Lista</option>
+					<option value="url">URL</option>
+				</select>
+			</div>
+			
+			<div class="ui-field-contain" id="listaLahde">
+			    <label for="select-native-1">Kuvan valinta</label>
+				<select name="alkuKuvanValinta" id="kuvanValinta">
+					<option value="" selected="selected" disabled>Valitse...</option>
+					<option value="1">Kuva1</option>
+					<option value="2">Kuva2</option>
+					<option value="3">Kuva3</option>
+				</select>
+			</div>
+			
+			<div class="ui-field-contain" id="urlLahde">
+				<label for="urlLahdeTeksti">Kuvan URL:</label>
+				<input name="urlLahdeTeksti" id="urlLahdeTeksti" value="" type="text">
+			</div>
+			<!-- Lopullisessa toteutuksessa tämä on tod.näk. button -->
+			<a href="#kuvanKatselu" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</a>
+		</div>	
+
+		<div data-role="footer">
+			<h1>Mobiiliohjelmointi</h1>   
+		</div>    
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<div data-role="page" id="kuvanKatselu">
+
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>360 kuvan katselu - Kuva</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>
+         
+		<div role="main" class="ui-content ">	
+		
+			<div>
+				<p>Tähän tulee itse kuvan katselu, sitten kun toteutetaan ohjelma lopullisesti</p>
+			</div>
+			
+   		</div>
+
+		<div data-role="footer">
+			<h1>Mobiiliohjelmointi</h1>
+		</div>
+
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<div data-role="page" id="tekijat">
+
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>360 kuvan katselu - Tekijät</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>
+         
+		<div role="main" class="ui-content ">	
+		
+			<div>
+				<p>Tänne tulee crediitit mm. javascriptiin, jolla katsotaan kuvia ja itse 360-kuviin</p>
+			</div>
+			
+   		</div>
+
+		<div data-role="footer">
+			<h1>Mobiiliohjelmointi</h1>
+		</div>
+
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<script>
+		$(document).one("pagebeforecreate", function () {	
+			$("#popupMenu").enhanceWithin().popup();
+			 $( "[data-role=panel]" ).panel().enhanceWithin();
+		});
+		
+		$(document).on("pagecreate", "#etusivu", function() {
+
+			
+		});
+		
+		$(document).on("pagebeforeshow", "#kuvanValinta", function() {
+			
+		});
+		
+		$(document).on("pagecreate", "#kuvanValinta", function() {
+			$( "#listaLahde" ).hide();
+			$( "#urlLahde" ).hide();
+			$( "#alkuKuvanValinta" ).change(function() {
+				var rock = $( "#alkuKuvanValinta" ).val();
+				if(rock=="lista"){
+					$( "#listaLahde" ).show();
+					$( "#urlLahde" ).hide();
+				} else {
+					$( "#listaLahde" ).hide();
+					$( "#urlLahde" ).show();
+				}
+			});
+		});
+		
+		$(document).on("pagecreate", "#kuvanKatselu", function() {
+			
+			
+		});
+
+		$(document).on("pagecreate", "#kuvanKatselu", function() {
+			
+		});
+		
+		
+		$(document).on("pagecreate", "#tekijat", function() {
+			
+		});
+	</script>
+</body>
+
+</html>
