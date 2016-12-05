@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+ 
+	<meta http-equiv="Content-Security-Policy" content="
+		default-src 'self' 'unsafe-inline' http://code.jquery.com https://code.jquery.com https://ssl.gstatic.com ws://10.3.100.14:3000 data: gap: ms-appdata: content: ; 
+		script-src 'self' 'unsafe-inline' http://code.jquery.com https://code.jquery.com https://ssl.gstatic.com  ws://10.3.100.14:3000;
+		connect-src 'self' http://maps.googleapis.com http://api.openweathermap.org ws://10.3.100.14:3000 http://proto424.haaga-helia.fi;
+		media-src 'self'; 
+	" /> 
+
+    <link rel="stylesheet"
+    href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+	<script
+	src="https://code.jquery.com/jquery-2.1.4.js"
+	integrity="sha256-siFczlgw4jULnUICcdm9gjQPZkw/YPDqhQ9+nAOScE4="
+	crossorigin="anonymous"></script>
+	
+	<script 
+    src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+	
+	<link rel="stylesheet" type="text/css" href="css/icon-pack-custom.css" />
+	
+   <link rel="stylesheet" href="css/themes/matkapaivakirja.css" />
+   <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+
+    <title>Matkapäiväkirja</title>
+</head>
+
+<body>
+
+	<div data-role="header" data-theme="a">
+		<h1>Matkapäiväkirja</h1>
+		<div data-role="navbar" id="navi">
+			<ul>
+				<li><a href="#etusivu" class="ui-btn ui-icon-grid ui-btn-icon-top ui-mini">Kaikki matkatapahtumat</a></li>
+				<li><a href="#uusi"  class="ui-btn ui-icon-briefcase ui-btn-icon-top ui-mini">Uusi matkatapahtuma</a></li>
+				<li><a href="#lahella" class="ui-btn ui-icon-glass ui-btn-icon-top ui-mini">Lähellä</a></li>
+			</ul>
+		</div>
+	</div>
+	<!-- /header -->
+	
+	<div data-role="page" id="etusivu" data-title="Kaikki matkatapahtumat">
+			
+		<div role="main" class="ui-content">
+			<ul data-role="listview" data-inset="true" id="matkatapahtumaListaus">
+			</ul>
+			
+			<div id="eiListausta"></div>
+		</div>
+			
+		<!-- /content -->
+		
+		 <div data-role="footer">
+			<h4>Mobiiliohjelmointi</h4>
+		</div>
+		<!-- /footer -->
+		
+	</div>
+	<!-- /page -->
+	
+	
+	<div data-role="page" id="uusi" data-title="Uusi matkatapahtuma">
+		
+		<div role="main" class="ui-content">
+			<div data-role="popup" id="popupLisays" data-overlay-theme="b">
+				<h3 id="lisaysViesti">Lisäys</h3>
+			</div>
+				
+			<form action="#" method="post" id="lisaaMatkatapahtumaLomake"> 
+			
+                <div class="ui-field-contain">
+					<label><img id="kuva" style="display:none" src="" alt="" width="100" height="100"></label>
+				
+					<button type="button"  disabled class="ui-btn ui-icon-camera ui-btn-icon-left ui-corner-all ui-btn-inline" id="otaKuva">Ota kuva</button>	
+					<button type="button"  disabled class="ui-btn ui-corner-all ui-btn-inline" id="lataaKuva">Lataa kuva</button>
+	            </div>	
+				
+                <div class="ui-field-contain">
+                    <label for="otsikko">Otsikko</label>
+                    <input type="text" id="otsikko" name="otsikko" class="tarkastaMatkatapahtumaOtsikko"> 
+                </div>
+				
+                <div class="ui-field-contain">
+                    <label for="paiva">Päivä</label>
+                    <input type="text" id="paiva" name="paiva">		
+				</div> 
+			
+                <div class="ui-field-contain">
+                    <label for="paikka">Paikka</label>
+                    <input type="text" id="paikka" name="paikka">
+                </div>  
+                   
+                <div class="ui-field-contain">
+                    <label for="saa">Sää</label>
+                    <input type="text" id="saa" name="saa">
+                </div>  
+                  
+                <div class="ui-field-contain"> 
+                    <label for="kuvaus">Kuvaus</label>
+                    <textarea id="kuvaus" name="kuvaus"></textarea>
+                </div>               
+     
+				<div class="ui-field-contain"> 
+					<button type="button" class="ui-btn ui-corner-all ui-btn-inline" id="lisaa" name="lisaa">Lisää</button>	
+					<a href="#" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-delete ui-btn-inline" id="tyhjenna" name="tyhjenna">Tyhjennä</a>	
+				</div>
+			</form> 
+ 
+		</div>
+		<!-- /content -->
+		
+		 <div data-role="footer">
+			<h4>Mobiiliohjelmointi</h4>
+		</div>
+		<!-- /footer -->
+		
+	</div>
+	<!-- /page -->
+	
+	<div data-role="page" id="lahella" data-title="Lähellä">
+	
+		<div class="ui-content">
+			<div class="ui-field-contain">
+				<label for="etaisyys">Etäisyys</label>
+				<select name="etaisyys" id="etaisyys">
+					<option value="200">200 metriä</option>
+					<option value="500">500 metriä</option>
+					<option value="1000">1 kilometri</option>
+					<option value="10000">10 kilometriä</option>
+				</select>
+			</div>
+			
+			<h3 id="lahellavastaus"></h3>
+			<ul data-role="listview" id="lahellaListaus" data-inset="true">
+			</ul>
+		</div>
+		<!-- /content -->
+	
+		<div data-role="footer">
+			<h4>Mobiiliohjelmointi</h4>
+		</div>
+		<!-- /footer -->
+	</div>
+	<!-- /page -->
+	
+    <script type="text/javascript" src="cordova.js"></script> 
+
+    <script type="text/javascript">
+	
+		var deviceReadyDeferred = $.Deferred();
+		var jqmReadyDeferredUusi = $.Deferred();
+		var jqmReadyDeferredLahella = $.Deferred();
+		
+		$.when(deviceReadyDeferred, jqmReadyDeferredUusi).done( uusiValmis );
+		$.when(deviceReadyDeferred, jqmReadyDeferredUusi).done( kameraValmis );
+	
+		document.addEventListener("deviceReady", onDeviceReady, false);
+		
+		var deviceReady = false;
+		function onDeviceReady() {
+			deviceReadyDeferred.resolve(); // jqmReadyDeferredUusi.resolve();
+			deviceReady = true;
+		}
+		
+		function uusiValmis() {
+		
+			navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
+
+			function onLocationSuccess(position) {
+				// Hae paikkakunta ja sää
+				haePaikkakunta(position.coords.latitude, position.coords.longitude);
+				haeSaa(position.coords.latitude, position.coords.longitude);
+			}
+					
+			function onLocationError() {
+				// $("#paikka").val("");
+				console.log("Paikannus ei onnistu");
+			}
+		}
+		
+		var fileURL = "";
+		
+		function kameraValmis() {
+			$( "#otaKuva" ).prop( "disabled", false );
+			$( "#lataaKuva").prop( "disabled", false );
+			
+			$( "#otaKuva" ).on("tap", function() {				
+				navigator.camera.getPicture(onCaptureSuccess, onError, { 
+					//destinationType: Camera.DestinationType.FILE_URI  // vain puhelimessa
+                    destinationType: Camera.DestinationType.DATA_URL,   // selaimessa ja puhelimessa
+					saveToPhotoAlbum: true,
+				})
+			})
+			
+			$( "#lataaKuva" ).on("tap", function() {
+				navigator.camera.getPicture(onLoadSuccess, onError, { 
+					destinationType: Camera.DestinationType.DATA_URL,  
+					sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+				})
+		
+			})
+			
+			function onCaptureSuccess(imageData) {
+				//$("#kuva").attr("src", image); //kun FILE_URI
+				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData);  // kun DATA_URL
+				$( "#kuva").show();
+				fileURL = imageData;
+			}
+			
+			function onLoadSuccess(imageData) {
+				//$("#kuva").attr("src", image); // kun FILE_URI
+				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData); // kun DATA_URL
+				$("#kuva").show();
+				fileURL = imageData;
+			}
+			
+			function onError() {
+				console.log("Kuvaaminen/lataaminen ei onnistu");
+			}
+		}
+		
+		function lahellaValmis() {
+			navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
+
+			function onLocationSuccess(position) {
+				// Hae lähellä
+			}
+					
+			function onLocationError() {
+	
+			}	
+		}
+
+		$(document).one("pagebeforecreate", function () {
+	 		$( "[data-role='navbar']" ).navbar();
+			$( "[data-role='header']" ).toolbar();
+		})
+	
+		
+		$(document).on("pagecreate", function() {
+				
+			$(document).on("pagecontainershow", function(){
+				$(".ui-content").height(getRealContentHeight());
+			})
+
+			$(window).on("resize orientationchange", function(){
+				$(".ui-content").height(getRealContentHeight());
+			})
+			
+			function getRealContentHeight() {
+				var activePage = $.mobile.pageContainer.pagecontainer("getActivePage"),
+					screen = $.mobile.getScreenHeight(),
+					header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
+					// header = $(".ui-header").hasClass("ui-header-fixed", activePage) ? $(".ui-header",  activePage).outerHeight() - 1 : $(".ui-header",  activePage).outerHeight(),
+					footer = $(".ui-footer", activePage).hasClass("ui-footer-fixed") ? $(".ui-footer", activePage).outerHeight() - 1 : $(".ui-footer", activePage).outerHeight(),
+					contentCurrent = $(".ui-content", activePage).outerHeight() - $(".ui-content", activePage).height();
+				
+				var content = screen - header - footer - contentCurrent;
+
+				return content;
+			}
+	
+			$(document).on("pagecontainerchange", function() {
+				var current = $( ".ui-page-active" ).jqmData( "title" );
+					
+				$( "[data-role='navbar'] a.ui-btn-active" ).removeClass( "ui-btn-active" );
+					
+				$( "[data-role='navbar'] a" ).each(function() {
+					if ( $( this ).text() === current ) {
+						$( this ).addClass( "ui-btn-active" );
+					}
+				})
+			})
+		})
+
+		
+		$(document).on("pagecreate", "#etusivu", function() {
+		
+			$(document).on("pagecontainerbeforeshow", function(event, data){
+				if (data.toPage[0].id == "etusivu") {
+					listaaMatkatapahtumatDB();
+				}
+			})			
+		})
+		
+		
+		$(document).on("pagecreate", "#uusi", function() {
+		    jqmReadyDeferredUusi.resolve();
+			$(document).on("pagecontainershow", function(event, data){
+				if (data.toPage[0].id == "uusi") {
+					//jqmReadyDeferredUusi.resolve();
+					//haePaikkakunta(60.2013725, 24.9340407);
+					//haeSaa(60.2013725, 24.9340407);
+				}
+			})
+			
+			$("#lisaa").on("tap", function() {
+				lisaaMatkatapahtumaDB();
+				
+				// Tyhjennä lomake 
+				//haePaikkakunta(60.2013725, 24.9340407);
+				//haeSaa(60.2013725, 24.9340407);
+				if (deviceReady) {
+					uusiValmis();
+				}
+				
+			})
+			
+		})
+		
+		
+		$(document).on("pagecreate", "#lahella", function() {
+		
+			$(document).on("pagecontainerbeforeshow", function(event, data) {
+				if (data.toPage[0].id == "lahella") {
+					haeLahella(60.2013, 24.934, $("#etaisyys").val());
+				}
+			})
+
+			$("#etaisyys").on("change", function() {
+				$("#lahellavastaus").html("");
+				$("#lahellaLista").html("").listview("refresh");
+				haeLahella(60.2013, 24.934, $("#etaisyys").val());
+			})
+		})
+		
+		function haePaikkakunta(lat, lon) {
+			$("#paikka").val("");
+			
+			$.ajax({
+				url: "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon,
+				dataType: "json",
+				timeout: 5000
+			})	
+			.done(function(data){	
+				var addressComponents = data.results[1].address_components;
+				for(i = 0; i < addressComponents.length;i++){
+					var types = addressComponents[i].types
+						
+					if(types == "locality,political"){
+						$("#paikka").val(addressComponents[i].long_name); 
+					}
+				}	
+			})
+			.fail(function() {
+				console.log("Paikkakunnan nimen hakeminen ei onnistu");	
+			})
+		}
+		
+		function haeSaa(lat, lon) { 
+			$("#saa").val("");
+					
+			$.ajax({
+				url: "http://api.openweathermap.org/data/2.5/weather?lang=fi&lat=" + lat + "&lon=" + lon + "&units=metric&APPID=32f1264bba3945837fa37cc1c29b4db1",
+				dataType: "json",
+				timeout: 5000
+			})	
+			.done(function(data){	
+				var teksti = data.main.temp.toFixed(0) + ", " + data.weather[0].description;
+				$("#saa").val(teksti);
+			})
+			.fail(function() {
+				console.log("Sään haku ei onnistu")	
+			})						
+		}
+		
+		function haeLahella(lat, lon, etaisyys) {  		
+			$.ajax({
+				url: "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lon +"&radius=" + etaisyys + "&type=restaurant&key=AIzaSyB3i51aqHjEzulU5uHuDB4peX8EUv5OxvA",
+				dataType: "json",
+				beforeSend: function() { 
+					$.mobile.loading( "show", {text: "Haetaan", textVisible: true}) 
+				}
+  			})	
+			.done(function(data){
+				var html = "";
+	 
+				$.each(data.results, function( index, result) {
+						
+						if (result.opening_hours && result.opening_hours.open_now == true) {
+							html = html + "<li>" + result.name + "<br>" + result.vicinity + "<br>Avoinna</li>";
+						} else {
+							html = html + "<li>" + result.name + "<br>" + result.vicinity + "</li>";
+						}
+				})
+
+				if (html.length > 0) {
+					$("#lahellavastaus").html("Ravintolat");
+					$("#lahellaListaus").html(html).listview("refresh");
+				}
+				else {
+					$("#lahellaListaus").html("").listview("refresh");
+					$("#lahellavastaus").html("Annetulla etäisyydellä ei ole ravintoloita");
+				}
+			})
+			.fail(function() {
+				$("#lahellaListaus").html("").listview("refresh");
+				$("#lahellavastaus").html("Ravintoloita ei voida hakea");
+				console.log("Lähellä haku ei onnistu");
+			})	
+			.complete(function() {
+				$.mobile.loading( "hide");
+			})			
+		}
+		
+		function lisaaMatkatapahtumaDB() {
+		
+			var matkatapahtuma = JSON.stringify({
+				"otsikko": $("#otsikko").val().trim(), 
+				"paikka": $("#paikka").val().trim(),
+				"paiva": muutaPaiva($("#paiva").val(), 2), 
+				"saa": $("#saa").val().trim(),
+				"kuvaus": $("#kuvaus").val().trim(),
+				"kuva": fileURL,
+				"kayttaja": "1402948"
+			})	
+		
+			$.ajax({
+				url: "http://proto424.haaga-helia.fi/addMatkatapahtuma.php",
+                dataType: "json",
+				method: "post",
+				data: matkatapahtuma,
+				beforeSend: function(){ $.mobile.loading( "show", {text: "Lisätään", textVisible: true}) } 
+            })
+			.done(function(data) {
+				$("#lisaysViesti").text("Lisättiin");
+			})
+			.fail(function() {
+				$("#lisaysViesti").text("Lisäys ei onnistunut");
+			})	
+			.complete(function() {
+				$.mobile.loading( "hide");	
+				$("#popupLisays").popup("open");
+				setTimeout(function() {$("#popupLisays").popup("close")}, 3000);
+	
+			})			
+		}
+		
+		function listaaMatkatapahtumatDB() {	
+			$.ajax({
+				url: "http://proto424.haaga-helia.fi/getMatkatapahtuma.php",
+				dataType: "json",
+				data: { kayttaja: 1402948 },
+				method: "get",
+				cache: false  	 				
+			})
+			.done(function( data ) {
+				var teksti = "";
+				$.each(data, function(index, tapahtuma) {
+					if (tapahtuma.kuva != "") {
+						teksti = teksti + "<li><img src='data:image/jpeg;base64," + tapahtuma.kuva + "'>" + 
+								 tapahtuma.otsikko + "<br>" + tapahtuma.paiva + "<br>" + tapahtuma.paikka + "</li>";
+					} else {
+						teksti = teksti + "<li>" + tapahtuma.otsikko + "<br>" + tapahtuma.paiva + "<br>" + tapahtuma.paikka + "</li>";
+					}
+				})
+				$("#matkatapahtumaListaus").html(teksti).listview("refresh");
+				
+				if (teksti.length == 0) {
+					$("#eiListausta").text("Ei ole yhtään matkatapahtumaa");
+				}
+				
+			})
+			.fail(function() {
+				$("#matkatapahtumaListaus").html("").listview("refresh");
+				$("#eiListausta").text("Matkatapahtumia ei saatu haettua");
+			})		
+		}
+		
+		function muutaPaiva(paiva, tyyppi) {
+			var vastaus = "", paivaOsat;
+			
+			if (tyyppi == 1 && paiva.length == 10) {
+				paivaOsat = paiva.split('-');
+				vastaus = paivaOsat[2] + "." + paivaOsat[1] + "." + paivaOsat[0];
+			} else if (tyyppi == 2 && paiva.length == 10) {
+				paivaOsat = $("#paiva").val().split(".");
+				vastaus = paivaOsat[2] + "-" + paivaOsat[1] + "-" + paivaOsat[0];
+			} 
+				
+			return vastaus;
+		}	
+						
+    </script>
+</body>
+
+</html>
