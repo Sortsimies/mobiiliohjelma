@@ -8,7 +8,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 	
  	<meta http-equiv="Content-Security-Policy" content="
-			default-src 'self' 'unsafe-inline' ws://192.168.1.123:3000 http://code.jquery.com https://code.jquery.com  https://ssl.gstatic.com gap: data: blob: filesystem: ; 
+			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com gap: data: blob: filesystem: ; 
 	" />
 	
 	<link rel="stylesheet" href="themes/siniteema.css" />
@@ -24,6 +24,10 @@
    src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
 
     <title>Mobiiliohjelmointi</title>
+	
+	<link  rel="stylesheet" href="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.css">
+	<script src="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.js"></script>
+	<script src="http://cdn.jtsage.com/jtsage-datebox/i18n/jtsage-datebox.i18n.fi.utf8.min.js"></script>
 
 	
 	<style>
@@ -94,7 +98,8 @@
 				</p>
 				<a href="#kuvanValinta" class="ui-btn ui-corner-all ui-btn-inline ui-icon-arrow-r ui-btn-icon-right">Valitse kuva</a>
 			</div>
-			<a href="matkapaivakirja.html">asd</a>
+			<a href="asdasdasd.html" data-ajax="false">asd</a>
+			<a href="lisaosa.html" data-ajax="false">dsa</a>
 		</div>
 
 		<div data-role="footer">
@@ -124,6 +129,8 @@
 
 		<div data-role="main" class="ui-content">	
 		
+			<ul data-role="listview" data-inset="true" id="kuvienListaus"></ul>
+			
 			<div class="ui-field-contain">
 			    <label for="select-native-1">Kuvan lähde</label>
 				<select name="alkuKuvanValinta" id="alkuKuvanValinta">
@@ -161,7 +168,11 @@
 	
 	
 	<div data-role="page" id="uusi" data-title="Uusi matkatapahtuma">
-		
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>Uusi kuva</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>  
 		<div role="main" class="ui-content">
 			<div data-role="popup" id="popupLisays" data-overlay-theme="b">
 				<h3 id="lisaysViesti">Lisäys</h3>
@@ -174,7 +185,12 @@
 				
 					<button type="button"  disabled class="ui-btn ui-icon-camera ui-btn-icon-left ui-corner-all ui-btn-inline" id="otaKuva">Ota kuva</button>	
 					<button type="button"  disabled class="ui-btn ui-corner-all ui-btn-inline" id="lataaKuva">Lataa kuva</button>
-	            </div>	
+	            </div>
+				
+				<div class="ui-field-contain">
+					<label for="automtiedot"> </label>
+					<button name="automtiedot" type="button" class="ui-btn ui-corner-all ui-btn-inline" id="automtiedot">Automaattiset tiedot</button>
+                </div>
 				
                 <div class="ui-field-contain">
                     <label for="otsikko">Otsikko</label>
@@ -188,7 +204,7 @@
 				
                 <div class="ui-field-contain">
                     <label for="paiva">Päivä</label>
-                    <input type="text" id="paiva" name="paiva">		
+                    <input name="paiva" id="paiva" type="text" />
 				</div> 
 			
                 <div class="ui-field-contain">
@@ -287,6 +303,42 @@
 	
 	
 	<script>
+		$(document).on("pagecreate", function() {
+				
+			$(document).on("pagecontainershow", function(){
+				$(".ui-content").height(getRealContentHeight());
+			})
+
+			$(window).on("resize orientationchange", function(){
+				$(".ui-content").height(getRealContentHeight());
+			})
+			
+			function getRealContentHeight() {
+				var activePage = $.mobile.pageContainer.pagecontainer("getActivePage"),
+					screen = $.mobile.getScreenHeight(),
+					header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
+					// header = $(".ui-header").hasClass("ui-header-fixed", activePage) ? $(".ui-header",  activePage).outerHeight() - 1 : $(".ui-header",  activePage).outerHeight(),
+					footer = $(".ui-footer", activePage).hasClass("ui-footer-fixed") ? $(".ui-footer", activePage).outerHeight() - 1 : $(".ui-footer", activePage).outerHeight(),
+					contentCurrent = $(".ui-content", activePage).outerHeight() - $(".ui-content", activePage).height();
+				
+				var content = screen - header - footer - contentCurrent;
+
+				return content;
+			}
+	
+			$(document).on("pagecontainerchange", function() {
+				var current = $( ".ui-page-active" ).jqmData( "title" );
+					
+				$( "[data-role='navbar'] a.ui-btn-active" ).removeClass( "ui-btn-active" );
+					
+				$( "[data-role='navbar'] a" ).each(function() {
+					if ( $( this ).text() === current ) {
+						$( this ).addClass( "ui-btn-active" );
+					}
+				})
+			})
+		})
+	
 		$(document).one("pagebeforecreate", function () {	
 			$("#popupMenu").enhanceWithin().popup();
 			 $( "[data-role=panel]" ).panel().enhanceWithin();
@@ -314,28 +366,71 @@
 					$( "#urlLahde" ).show();
 				}
 			});
+			
+			$(document).on("pagecontainerbeforeshow", function(event, data){
+				if (data.toPage[0].id == "kuvanValinta") {
+					listaaKuvat();
+				}
+			})
+			
 		});
 		
 		$(document).on("pagecreate", "#kuvanKatselu", function() {
 			
 			
 		});
-
+		
+		var tiedot = {};
+		
 		$(document).on("pagecreate", "#uusi", function() {
 		
-			$( "#tyhjenna" ).on("tap", function() {				
-				$( "#otsikko" ).val("");
-				$( "#paiva" ).val("");
-				$( "#paikka" ).val("");
-				$( "#saa" ).val("");
-				$( "#kuvaus" ).val("");
-			});
+			$("#paiva").datebox({
+				mode: "datebox", 
+				showInitialValue: true,
+				beforeToday: true, 
+				useFocus: true,
+			})
+
+			$("#lisaa").on("tap", function() {
+				tiedot.otsikko=$( "#otsikko" ).val();
+				tiedot.kuvaus=$( "#kuvaus" ).val();
+				tiedot.paiva=$( "#paiva" ).val();
+				tiedot.paikka=$( "#paikka" ).val();
+				tiedot.saa=$( "#saa" ).val();
+				lisaaKuva();
+
+			})
 			
-			
-			$( "#lisaa" ).on("tap", function() {				
+			$(document).on("pagecontainerbeforeshow", function(event, data){
 				
+				if (data.toPage[0].id == "uusi") {
+					tyhjenna();
+				}
+			})
+		
+			$( "#tyhjenna" ).on("tap", function() {				
+				tyhjenna();
 			});
 			
+			$( "#automtiedot" ).on("tap", function() {	
+				var dd = new Date();
+				var date = dd.toISOString().slice(0,10); 
+				var d = date.split("-");
+				$("#paiva").val(d[2]+"."+d[1]+"."+d[0]);
+				
+				navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
+
+				function onLocationSuccess(position) {
+					// Hae paikkakunta ja sää
+					haePaikkakunta(position.coords.latitude, position.coords.longitude);
+					haeSaa(position.coords.latitude, position.coords.longitude);
+				}
+						
+				function onLocationError() {
+					// $("#paikka").val("");
+					console.log("Paikannus ei onnistu");
+				}
+			});
 			
 		});
 		
@@ -344,29 +439,36 @@
 			
 		});
 		
-		function lisaaKuvat() {
+		function tyhjenna(){
+			$( "#otsikko" ).val("");
+			$( "#paiva" ).val("");
+			$( "#paikka" ).val("");
+			$( "#saa" ).val("");
+			$( "#kuvaus" ).val("");
+		}
 		
-			var DBOpenRequest = window.indexedDB.open("saaIDB", 1);
+		function lisaaKuva() {
+			var DBOpenRequest = window.indexedDB.open("kuvaIDB", 1);
 	
 			DBOpenRequest.onupgradeneeded = function (event) {
 				var db = DBOpenRequest.result;					
-				if (db.objectStoreNames.contains("saa")) {
-					db.deleteObjectStore("saa");
+				if (db.objectStoreNames.contains("kuva")) {
+					db.deleteObjectStore("kuva");
 				}
 					
-				var objectStore = db.createObjectStore("saa", { autoIncrement : true });
+				var objectStore = db.createObjectStore("kuva", { autoIncrement : true });
 			}
 				
 			DBOpenRequest.onsuccess = function(event) {	
 				var db = DBOpenRequest.result;	
-				var transaction = db.transaction(["saa"], "readwrite");		
-				var objectStore = transaction.objectStore("saa");
+				var transaction = db.transaction(["kuva"], "readwrite");		
+				var objectStore = transaction.objectStore("kuva");
 				// Tee tallennus
-				objectStore.add(saaTiedot);
+				objectStore.add(tiedot);
 					
 				transaction.oncomplete = function(event) {
-					db.close();			
-					listaaSaat();
+					db.close();
+					tyhjenna();
 				}
 			
 				transaction.onerror = function(event) {
@@ -381,47 +483,89 @@
 		}
 
 		function listaaKuvat() {
-			var DBOpenRequest = window.indexedDB.open("saaIDB", 1);	
+			var DBOpenRequest = window.indexedDB.open("kuvaIDB", 1);	
 				
 			DBOpenRequest.onupgradeneeded = function (event) {
 				var db = DBOpenRequest.result;					
-				if (db.objectStoreNames.contains("saa")) {
-					db.deleteObjectStore("saa");
+				if (db.objectStoreNames.contains("kuva")) {
+					db.deleteObjectStore("kuva");
 				}
 					
-				var objectStore = db.createObjectStore("saa", { autoIncrement : true });
+				var objectStore = db.createObjectStore("kuva", { autoIncrement : true });
 			}
 				
 			DBOpenRequest.onsuccess = function(event) {
 				var db = DBOpenRequest.result;
-				var transaction = db.transaction(["saa"], "readonly");
-				var objectStore = transaction.objectStore("saa");
+				var transaction = db.transaction(["kuva"], "readonly");
+				var objectStore = transaction.objectStore("kuva");
 	
 				var html = "";
 				var lkm = 0;
 						
 				objectStore.openCursor().onsuccess  = function(event) {		
-					// Tee listaus
 					var cursor = event.target.result;
 					
 					if(cursor){
-						html+="<p><img align='middle' src='http://api.openweathermap.org/img/w/"+cursor.value.icon+"' alt=''></img><b>"+ cursor.value.paikka+", "+cursor.value.paiva+"</b>, "+cursor.value.lampotila+"°C, "+cursor.value.kuvaus+"</p>";
+						html+=	"<li>"+cursor.value.otsikko+", "+
+								cursor.value.kuvaus+", "+
+								cursor.value.paikka+", "+
+								cursor.value.paiva+", "+
+								cursor.value.saa+"</li>";
 						cursor.continue();
 					}
 					
 				}
 						
 				transaction.oncomplete = function(event) {
-					// Näytä listaus sivulla		
 					if(html.length>0){
-						$("#saaListaus").html(html);
+						$("#kuvienListaus").html(html).listview("refresh");
 					}
 				}
 					
 				transaction.onerror = function(event) {
-					// Näytä virheilmoitus				
+					console.log("virhe");				
 				}
 			}
+		}
+
+		function haePaikkakunta(lat, lon) {
+			$("#paikka").val("");
+			
+			$.ajax({
+				url: "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon,
+				dataType: "json",
+				timeout: 5000
+			})	
+			.done(function(data){	
+				var addressComponents = data.results[1].address_components;
+				for(i = 0; i < addressComponents.length;i++){
+					var types = addressComponents[i].types
+						
+					if(types == "locality,political"){
+						$("#paikka").val(addressComponents[i].long_name); 
+					}
+				}	
+			})
+			.fail(function() {
+				console.log("Paikkakunnan nimen hakeminen ei onnistu");	
+			})
+		}
+		
+		function haeSaa(lat, lon) { 
+			$("#saa").val("");
+					
+			$.ajax({
+				url: "http://api.openweathermap.org/data/2.5/weather?lang=fi&lat=" + lat + "&lon=" + lon + "&units=metric&APPID=32f1264bba3945837fa37cc1c29b4db1",
+				dataType: "json",
+				timeout: 5000
+			})	
+			.done(function(data){	
+				var teksti = data.main.temp.toFixed(0) + ", " + data.weather[0].description +", tuuli: "+data.wind.speed+" m/s";
+				$("#saa").val(teksti);
+			})
+			.fail(function() {
+				console.log("Sään haku ei onnistu")	
+			})						
 		}		
 
 	</script>
