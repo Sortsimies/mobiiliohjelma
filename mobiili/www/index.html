@@ -8,7 +8,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 	
  	<meta http-equiv="Content-Security-Policy" content="
-			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com gap: data: blob: filesystem: ; 
+			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com http://maps.googleapis.com http://api.openweathermap.org gap: data: blob: filesystem: ; 
 	" />
 	
 	<link rel="stylesheet" href="themes/siniteema.css" />
@@ -50,6 +50,10 @@
 		.transparentBG{
 			 background-color: rgba(8,47,67,0.5);
 		}
+		
+		.urlKatsoNappi{
+			float:right;
+		}
 	</style>
 </head>
 
@@ -61,10 +65,9 @@
 	<div data-role="panel" id="menupanel" data-display="overlay" data-position="right" data-theme="a" class="transparentBG">
 	<br>
 		<ul data-role="listview" data-inset="true">
-			<li data-icon="home"><a href="#etusivu">Etusivu2</a></li>
-			<li data-icon="home"><a href="#uusi">Uusi</a></li>
+			<li data-icon="home"><a href="#etusivu">Etusivu</a></li>
+			<li data-icon="plus"><a href="#uusi">Uusi</a></li>
 			<li data-icon="arrow-r"><a href="#kuvanValinta">Kuvan valinta</a></li>
-			<li data-icon="user"><a href="#tekijat">Tekijät</a></li>
 		</ul><br>
 		<a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-icon-delete ui-btn-icon-right" data-rel="close" style="float:right">Sulje</a>
 	</div>
@@ -129,33 +132,23 @@
 
 		<div data-role="main" class="ui-content">	
 		
-			<ul data-role="listview" data-inset="true" id="kuvienListaus"></ul>
-			
 			<div class="ui-field-contain">
 			    <label for="select-native-1">Kuvan lähde</label>
 				<select name="alkuKuvanValinta" id="alkuKuvanValinta">
-					<option value="" selected="selected" disabled>Valitse...</option>
-					<option value="lista">Lista</option>
+					<option value="lista" selected="selected">Lista</option>
 					<option value="url">URL</option>
 				</select>
 			</div>
 			
-			<div class="ui-field-contain" id="listaLahde">
-			    <label for="select-native-1">Kuvan valinta</label>
-				<select name="alkuKuvanValinta" id="kuvanValinta">
-					<option value="" selected="selected" disabled>Valitse...</option>
-					<option value="1">Kuva1</option>
-					<option value="2">Kuva2</option>
-					<option value="3">Kuva3</option>
-				</select>
-			</div>
+			<ul data-role="listview" data-inset="true" id="kuvienListaus"></ul>
+			
 			
 			<div class="ui-field-contain" id="urlLahde">
 				<label for="urlLahdeTeksti">Kuvan URL:</label>
 				<input name="urlLahdeTeksti" id="urlLahdeTeksti" value="" type="text">
 			</div>
 			<!-- Lopullisessa toteutuksessa tämä on tod.näk. button -->
-			<a href="#kuvanKatselu" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</a>
+			<a href="#kuvanKatselu" id="urlKatso" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</a>
 		</div>	
 
 		<div data-role="footer">
@@ -198,7 +191,7 @@
                 </div>
 				
 				<div class="ui-field-contain"> 
-                    <label for="kuvaus">Kuvaus</label>
+                    <label for="kuvaus">Kuvaus1</label>
                     <textarea id="kuvaus" name="kuvaus"></textarea>
                 </div> 
 				
@@ -234,7 +227,7 @@
 	</div>
 	
 	
-	
+
 	
 	
 	
@@ -265,31 +258,7 @@
 	
 	
 	
-	
-	
-	
-	
-	<div data-role="page" id="tekijat">
 
-		<div data-role="header">
-			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
-			<h1>360 kuvan katselu - Tekijät</h1>
-			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
-		</div>
-         
-		<div role="main" class="ui-content ">	
-		
-			<div>
-				<p>Tänne tulee crediitit mm. javascriptiin, jolla katsotaan kuvia ja itse 360-kuviin</p>
-			</div>
-			
-   		</div>
-
-		<div data-role="footer">
-			<h1>Mobiiliohjelmointi</h1>
-		</div>
-
-	</div>
 	
 	
 	
@@ -300,9 +269,25 @@
 	
 	
 	
-	
+	<script type="text/javascript" src="cordova.js"></script> 
 	
 	<script>
+	
+		var deviceReadyDeferred = $.Deferred();
+		var jqmReadyDeferredUusi = $.Deferred();
+		//var jqmReadyDeferredLahella = $.Deferred();
+		
+		//$.when(deviceReadyDeferred, jqmReadyDeferredUusi).done( uusiValmis );
+		$.when(deviceReadyDeferred, jqmReadyDeferredUusi).done( kameraValmis );
+		
+		document.addEventListener("deviceReady", onDeviceReady, false);
+		
+		var deviceReady = false;
+		function onDeviceReady() {
+			deviceReadyDeferred.resolve(); // jqmReadyDeferredUusi.resolve();
+			deviceReady = true;
+		}
+		
 		$(document).on("pagecreate", function() {
 				
 			$(document).on("pagecontainershow", function(){
@@ -354,16 +339,19 @@
 		});
 		
 		$(document).on("pagecreate", "#kuvanValinta", function() {
-			$( "#listaLahde" ).hide();
+			$( "#kuvienListaus" ).show();
 			$( "#urlLahde" ).hide();
+			$( "#urlKatso" ).hide();
 			$( "#alkuKuvanValinta" ).change(function() {
-				var rock = $( "#alkuKuvanValinta" ).val();
-				if(rock=="lista"){
-					$( "#listaLahde" ).show();
+				var asd = $( "#alkuKuvanValinta" ).val();
+				if(asd=="lista"){
+					$( "#kuvienListaus" ).show();
 					$( "#urlLahde" ).hide();
+					$( "#urlKatso" ).hide();
 				} else {
-					$( "#listaLahde" ).hide();
+					$( "#kuvienListaus" ).hide();
 					$( "#urlLahde" ).show();
+					$( "#urlKatso" ).show();
 				}
 			});
 			
@@ -372,6 +360,8 @@
 					listaaKuvat();
 				}
 			})
+			
+			
 			
 		});
 		
@@ -383,7 +373,7 @@
 		var tiedot = {};
 		
 		$(document).on("pagecreate", "#uusi", function() {
-		
+			jqmReadyDeferredUusi.resolve();
 			$("#paiva").datebox({
 				mode: "datebox", 
 				showInitialValue: true,
@@ -418,24 +408,18 @@
 				var d = date.split("-");
 				$("#paiva").val(d[2]+"."+d[1]+"."+d[0]);
 				
-				navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
+				navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 10000 });
 
 				function onLocationSuccess(position) {
-					// Hae paikkakunta ja sää
 					haePaikkakunta(position.coords.latitude, position.coords.longitude);
 					haeSaa(position.coords.latitude, position.coords.longitude);
 				}
 						
-				function onLocationError() {
-					// $("#paikka").val("");
-					console.log("Paikannus ei onnistu");
+				function onLocationError(err) {
+					$("#paikka").val("Haku epäonnistui");
+					$("#saa").val("Haku epäonnistui");
 				}
 			});
-			
-		});
-		
-		
-		$(document).on("pagecreate", "#tekijat", function() {
 			
 		});
 		
@@ -510,7 +494,9 @@
 								cursor.value.kuvaus+", "+
 								cursor.value.paikka+", "+
 								cursor.value.paiva+", "+
-								cursor.value.saa+"</li>";
+								cursor.value.saa+
+								"<span class='urlKatsoNappi'><button linkki='"+cursor.value.otsikko+"' class='nappi ui-btn ui-corner-all ui-icon-eye ui-btn-icon-notext'>asd</button></span>"+
+								"</li>";
 						cursor.continue();
 					}
 					
@@ -520,12 +506,22 @@
 					if(html.length>0){
 						$("#kuvienListaus").html(html).listview("refresh");
 					}
+					$(".nappi").each(function( index ) {
+						console.log( index + ": " + $( this ).attr('linkki') );
+						$( this ).on("tap", function() {				
+							console.log($( this ).attr('linkki'));
+						});
+					});
 				}
 					
 				transaction.onerror = function(event) {
 					console.log("virhe");				
 				}
 			}
+		}
+		
+		function asd(teksti){
+			console.log(teksti);
 		}
 
 		function haePaikkakunta(lat, lon) {
@@ -547,7 +543,7 @@
 				}	
 			})
 			.fail(function() {
-				console.log("Paikkakunnan nimen hakeminen ei onnistu");	
+				$("#paikka").val("Haku epäonnistui");
 			})
 		}
 		
@@ -560,14 +556,58 @@
 				timeout: 5000
 			})	
 			.done(function(data){	
-				var teksti = data.main.temp.toFixed(0) + ", " + data.weather[0].description +", tuuli: "+data.wind.speed+" m/s";
+				var teksti = data.main.temp.toFixed(0) + "°C , " + data.weather[0].description +", tuuli: "+data.wind.speed+" m/s";
 				$("#saa").val(teksti);
 			})
 			.fail(function() {
-				console.log("Sään haku ei onnistu")	
+				$("#saa").val("Haku epäonnistui");
 			})						
-		}		
+		}
 
+		function katsoKuvaa(kuva){
+			console.log(kuva);
+		}
+
+		
+		function kameraValmis() {
+			$( "#otaKuva" ).prop( "disabled", false );
+			$( "#lataaKuva").prop( "disabled", false );
+			
+			$( "#otaKuva" ).on("tap", function() {				
+				navigator.camera.getPicture(onCaptureSuccess, onError, { 
+					//destinationType: Camera.DestinationType.FILE_URI  // vain puhelimessa
+                    destinationType: Camera.DestinationType.DATA_URL,   // selaimessa ja puhelimessa
+					saveToPhotoAlbum: true,
+				})
+			})
+			
+			$( "#lataaKuva" ).on("tap", function() {
+				navigator.camera.getPicture(onLoadSuccess, onError, { 
+					destinationType: Camera.DestinationType.DATA_URL,  
+					sourceType: Camera.PictureSourceType.PHOTOLIBRARY
+				})
+		
+			})
+			
+			function onCaptureSuccess(imageData) {
+				//$("#kuva").attr("src", image); //kun FILE_URI
+				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData);  // kun DATA_URL
+				$( "#kuva").show();
+				fileURL = imageData;
+			}
+			
+			function onLoadSuccess(imageData) {
+				//$("#kuva").attr("src", image); // kun FILE_URI
+				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData); // kun DATA_URL
+				$("#kuva").show();
+				fileURL = imageData;
+			}
+			
+			function onError() {
+				console.log("Kuvaaminen/lataaminen ei onnistu");
+			}
+		}
+		
 	</script>
 </body>
 

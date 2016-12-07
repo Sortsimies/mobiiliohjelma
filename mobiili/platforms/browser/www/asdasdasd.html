@@ -230,7 +230,7 @@
 		}
 		
 		function lahellaValmis() {
-			navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
+			navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 10000 });
 
 			function onLocationSuccess(position) {
 				// Hae lähellä
