@@ -68,6 +68,7 @@
 			<li data-icon="home"><a href="#etusivu">Etusivu</a></li>
 			<li data-icon="plus"><a href="#uusi">Uusi</a></li>
 			<li data-icon="arrow-r"><a href="#kuvanValinta">Kuvan valinta</a></li>
+			<li data-icon="navigation"><a href="#peliSivu">Peli</a></li>
 		</ul><br>
 		<a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-icon-delete ui-btn-icon-right" data-rel="close" style="float:right">Sulje</a>
 	</div>
@@ -261,7 +262,48 @@
 
 	
 	
+	<div data-role="page" id="peliSivu">
 	
+		<div data-role="header">
+			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
+			<h1>Peli</h1>
+			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		</div>   
+
+		<div data-role="main" class="ui-content">	
+			<div class="ui-field-contain"> 
+				<label for="flip-5">Vaikeustaso:</label>
+				<select name="flip-5" id="flip-5" data-role="slider" data-theme="c" data-track-theme="a">
+					<option value="helppo">Helppo</option>
+					<option value="vaikea">Vaikea</option>
+				</select>
+				
+				<div data-role="fieldcontain">
+					<label for="slider-step">Tarkkuus toleranssi:</label>
+					<input type="range" name="slider-step" id="slider-step" value="1" min="0" max="2" step="0.2" />
+				</div>
+
+			</div>
+			<div class="ui-field-contain"> 
+				<button class="ui-btn ui-corner-all ui-btn-inline ui-icon-plus" id="aloitaPeli">Aloita peli</button>
+				<button class="ui-btn ui-corner-all ui-btn-inline ui-icon-delete" id="lopetaPeli">Lopeta peli</button>
+			</div>
+			<div class="ui-field-contain"> 
+				<label id="xLabel" for="xfield">X</label>
+				<input type="text" id="xfield" name="xfield" maxlength="4" size="4"/>
+			
+				<label id="yLabel" for="yfield">Y</label>
+				<input type="text" id="yfield" name="yfield"/>
+			
+				<label id="zLabel" for="zfield">Z</label>
+				<input type="text" id="zfield" name="zfield"/>
+			</div>
+		</div>	
+
+		<div data-role="footer">
+			<h1>Mobiiliohjelmointi</h1>   
+		</div>    
+	</div>
 	
 	
 	
@@ -326,8 +368,11 @@
 	
 		$(document).one("pagebeforecreate", function () {	
 			$("#popupMenu").enhanceWithin().popup();
-			 $( "[data-role=panel]" ).panel().enhanceWithin();
+			$("#slider-1").slider();
+			$( "[data-role=panel]" ).panel().enhanceWithin();
+			
 		});
+		
 		
 		$(document).on("pagecreate", "#etusivu", function() {
 
@@ -336,6 +381,119 @@
 		
 		$(document).on("pagebeforeshow", "#kuvanValinta", function() {
 			
+		});
+		
+		$(document).on("pagecreate", "#peliSivu", function() {
+			
+			var watchID = null;
+			
+			
+			
+			$("#aloitaPeli").on("tap", function() {
+				if(deviceReady){
+					
+					var targetX;
+					var targetY;
+					var targetZ;
+					var data = {
+					  'jsonrpc': '2.0',
+					  'method': 'generateIntegers',
+					  'params': {
+						'apiKey': '00000000-0000-0000-0000-000000000000',
+						'n': 3,
+						'min': -9,
+						'max': 9,
+						'replacement': true,
+						'base': 10
+					  },
+					  'id': 1337
+					};
+
+					$.ajax({
+					  url: 'https://api.random.org/json-rpc/1/invoke',
+					  type: "POST",
+					  data: JSON.stringify(data),
+					  contentType: "application/json; charset=utf-8",
+					  dataType: "json"
+					}).done(function(data){	
+						targetX = data.result.random.data[0];
+						targetY = data.result.random.data[1];
+						targetZ = data.result.random.data[2];
+					})
+					.fail(function() {
+						targetX = Math.floor((Math.random() * 18) + 0)-9;
+						targetY = Math.floor((Math.random() * 18) + 0)-9;
+						targetZ = Math.floor((Math.random() * 18) + 0)-9;
+					}).always(function() {
+						var toleranssi = parseFloat($("#slider-step").val());
+						var xDone = false;
+						var yDone = false;
+						var zDone = false;
+						
+						$("#xfield").css({'background-color':'white'});
+						$("#yfield").css({'background-color':'white'});
+						$("#zfield").css({'background-color':'white'});
+						$("#xLabel").html("X - target: "+targetX);
+						$("#yLabel").html("Y - target: "+targetY);
+						$("#zLabel").html("Z - target: "+targetZ);
+						
+						function onSuccess(acceleration) {
+							if($("#flip-5").val() == 'vaikea'){
+								xDone=false;
+								yDone=false;
+								zDone=false;
+								$("#xfield").css({'background-color':'white'});
+								$("#yfield").css({'background-color':'white'});
+								$("#zfield").css({'background-color':'white'});
+							}
+							var x = acceleration.x.toFixed(5);
+							var y = acceleration.y.toFixed(5);
+							var z = acceleration.z.toFixed(5);
+							$("#xfield").val(x);
+							$("#yfield").val(y);
+							$("#zfield").val(z);
+							
+							if( x > targetX-toleranssi && x < targetX+toleranssi){
+								xDone=true;
+								$("#xfield").css({'background-color':'green'});
+							}
+							if( y > targetY-toleranssi && y < targetY+toleranssi){
+								yDone=true;
+								$("#yfield").css({'background-color':'green'});
+							}
+							if( z > targetZ-toleranssi && z < targetZ+toleranssi){
+								zDone=true;
+								$("#zfield").css({'background-color':'green'});
+							}
+							
+							if(xDone&&yDone&&zDone){
+								lopetaPeli();
+							}
+						}
+
+						function onError() {
+							alert('onError!');
+						}
+
+						var options = { frequency: 100 };
+
+						watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+					});
+					
+					
+				}
+			});
+			
+			$("#lopetaPeli").on("tap", function() {
+				lopetaPeli();
+			});
+			
+			function lopetaPeli(){
+				if (watchID) {
+					navigator.accelerometer.clearWatch(watchID);
+					watchID = null;
+				}
+			}
 		});
 		
 		$(document).on("pagecreate", "#kuvanValinta", function() {
@@ -518,10 +676,6 @@
 					console.log("virhe");				
 				}
 			}
-		}
-		
-		function asd(teksti){
-			console.log(teksti);
 		}
 
 		function haePaikkakunta(lat, lon) {
