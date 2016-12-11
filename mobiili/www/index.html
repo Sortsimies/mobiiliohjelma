@@ -8,7 +8,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 	
  	<meta http-equiv="Content-Security-Policy" content="
-			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com http://maps.googleapis.com http://api.openweathermap.org gap: data: blob: filesystem: ; 
+			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 https://upload.wikimedia.org/ http://upload.wikimedia.org/ http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com http://maps.googleapis.com http://api.openweathermap.org gap: data: blob: filesystem: ; 
 	" />
 	
 	<link rel="stylesheet" href="themes/siniteema.css" />
@@ -54,6 +54,9 @@
 		.urlKatsoNappi{
 			float:right;
 		}
+		.urlPoistaNappi{
+			float:left;
+		}
 	</style>
 </head>
 
@@ -87,20 +90,20 @@
 	<div data-role="page" id="etusivu">
 		<div data-role="header">
 			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
-			<h1>360&deg; kuvan katselu</h1>
+			<h1>Etusivu</h1>
 			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
 		</div>
          
 		<div role="main" class="ui-content ">
 			<div class="boxRound">
 				<br/>
-				<h2 class="centerText">360&deg; kuvan katselu<br>Miikka Alatalo 2016<br>Mobiiliohjelmointi</h2>
+				<h2 class="centerText">Miikka Alatalo 2016<br>Mobiiliohjelmointi</h2>
 			</div><br>
 			<div class="centerText">
-				<p>Tällä ohjelmalla voit katsoa 360-asteen kuvia puhelimen gyroscopea hyväksikäyttäen.<br>
-				Voit valita kuvan valmiista listasta tai voit myös antaa URL-osoitteen kuvalle.
-				</p>
+				
+				<a href="#uusi" class="ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-right">Uusi kuva</a>
 				<a href="#kuvanValinta" class="ui-btn ui-corner-all ui-btn-inline ui-icon-arrow-r ui-btn-icon-right">Valitse kuva</a>
+				<a href="#peliSivu" class="ui-btn ui-corner-all ui-btn-inline ui-icon-navigation ui-btn-icon-right">Peli</a>
 			</div>
 			<a href="asdasdasd.html" data-ajax="false">asd</a>
 			<a href="lisaosa.html" data-ajax="false">dsa</a>
@@ -145,10 +148,9 @@
 			
 			
 			<div class="ui-field-contain" id="urlLahde">
-				<label for="urlLahdeTeksti">Kuvan URL:</label>
+				<label for="urlLahdeTeksti">URL (vain https://upload.wikimedia.org):</label>
 				<input name="urlLahdeTeksti" id="urlLahdeTeksti" value="" type="text">
 			</div>
-			<!-- Lopullisessa toteutuksessa tämä on tod.näk. button -->
 			<a href="#kuvanKatselu" id="urlKatso" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</a>
 		</div>	
 
@@ -192,7 +194,7 @@
                 </div>
 				
 				<div class="ui-field-contain"> 
-                    <label for="kuvaus">Kuvaus1</label>
+                    <label for="kuvaus">Kuvaus</label>
                     <textarea id="kuvaus" name="kuvaus"></textarea>
                 </div> 
 				
@@ -236,20 +238,23 @@
 
 		<div data-role="header">
 			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
-			<h1>360 kuvan katselu - Kuva</h1>
+			<h1>Kuva</h1>
+			
 			<a href="#menupanel" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
 		</div>
          
 		<div role="main" class="ui-content ">	
 		
-			<div>
-				<p>Tähän tulee itse kuvan katselu, sitten kun toteutetaan ohjelma lopullisesti</p>
+			<div id="kuvankatseludivi">
+				
 			</div>
 			
    		</div>
 
 		<div data-role="footer">
+			<a href="#kuvanValinta" class="ui-btn ui-corner-all ui-btn-inline ui-icon-arrow-l ui-btn-icon-left" style="float:right">Takaisin</a>
 			<h1>Mobiiliohjelmointi</h1>
+			
 		</div>
 
 	</div>
@@ -315,6 +320,8 @@
 	
 	<script>
 	
+		var imgsrc = "";
+	
 		var deviceReadyDeferred = $.Deferred();
 		var jqmReadyDeferredUusi = $.Deferred();
 		//var jqmReadyDeferredLahella = $.Deferred();
@@ -379,7 +386,14 @@
 			
 		});
 		
-		$(document).on("pagebeforeshow", "#kuvanValinta", function() {
+		$(document).on("pagecreate", "#kuvanKatselu", function() {
+			
+			
+			
+		});
+		
+		$(document).on("pagebeforeshow", "#kuvanKatselu", function() {
+			$('#kuvankatseludivi').prepend('<img id="theImg" style="width:100%" src="'+imgsrc+'" />')
 			
 		});
 		
@@ -497,6 +511,11 @@
 		});
 		
 		$(document).on("pagecreate", "#kuvanValinta", function() {
+		
+			$("#urlKatso").on("tap", function() {
+				imgsrc=$("#urlLahdeTeksti").val();
+			});
+		
 			$( "#kuvienListaus" ).show();
 			$( "#urlLahde" ).hide();
 			$( "#urlKatso" ).hide();
@@ -653,6 +672,7 @@
 								cursor.value.paikka+", "+
 								cursor.value.paiva+", "+
 								cursor.value.saa+
+								"<span class='urlPoistaNappi'><button otsikko='"+cursor.value.otsikko+"' paiva='"+cursor.value.paiva+"' class='poistonappi ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext'>asd</button></span>"+
 								"<span class='urlKatsoNappi'><button linkki='"+cursor.value.otsikko+"' class='nappi ui-btn ui-corner-all ui-icon-eye ui-btn-icon-notext'>asd</button></span>"+
 								"</li>";
 						cursor.continue();
@@ -665,11 +685,67 @@
 						$("#kuvienListaus").html(html).listview("refresh");
 					}
 					$(".nappi").each(function( index ) {
-						console.log( index + ": " + $( this ).attr('linkki') );
 						$( this ).on("tap", function() {				
 							console.log($( this ).attr('linkki'));
 						});
 					});
+					$(".poistonappi").each(function( index ) {
+						$( this ).on("tap", function() {	
+							poistaDatabasesta($( this ).attr('otsikko'), $( this ).attr('paiva'));
+							//console.log($( this ).attr('paiva'));
+							//console.log($( this ).attr('otsikko'));
+						});
+					});
+				}
+					
+				transaction.onerror = function(event) {
+					console.log("virhe");				
+				}
+			}
+		}
+		
+		function poistaDatabasesta(otsikko, paiva){
+			var r = confirm("Haluatko varmasti poistaa? ("+otsikko+", "+paiva+")");
+			if (r == false) {
+				return;
+			}
+			var DBOpenRequest = window.indexedDB.open("kuvaIDB", 1);	
+				
+			DBOpenRequest.onupgradeneeded = function (event) {
+				var db = DBOpenRequest.result;					
+				if (db.objectStoreNames.contains("kuva")) {
+					db.deleteObjectStore("kuva");
+				}
+					
+				var objectStore = db.createObjectStore("kuva", { autoIncrement : true });
+			}
+				
+			DBOpenRequest.onsuccess = function(event) {
+				var db = DBOpenRequest.result;
+				var transaction = db.transaction(["kuva"], "readwrite");
+				var objectStore = transaction.objectStore("kuva");
+	
+				var html = "";
+				var lkm = 0;
+						
+				objectStore.openCursor().onsuccess  = function(event) {		
+					var cursor = event.target.result;
+					
+					if(cursor){
+						if(cursor.value.otsikko==otsikko && cursor.value.paiva==paiva){
+							var request = cursor.delete();
+							request.onsuccess = function() {
+								console.log('deleted');
+							};
+						}
+						
+						cursor.continue();
+					}
+					
+				}
+						
+				transaction.oncomplete = function(event) {
+					listaaKuvat();
 				}
 					
 				transaction.onerror = function(event) {
