@@ -8,7 +8,7 @@
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
 	
  	<meta http-equiv="Content-Security-Policy" content="
-			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 https://upload.wikimedia.org/ http://upload.wikimedia.org/ http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com http://maps.googleapis.com http://api.openweathermap.org gap: data: blob: filesystem: ; 
+			default-src 'self' 'unsafe-inline' ws://192.168.10.44:3000 http://ajax.aspnetcdn.com https://upload.wikimedia.org/ http://upload.wikimedia.org/ http://code.jquery.com https://code.jquery.com http://cdn.jtsage.com/ https://ssl.gstatic.com http://maps.googleapis.com http://api.openweathermap.org gap: data: blob: filesystem: ; 
 	" />
 	
 	<link rel="stylesheet" href="themes/siniteema.css" />
@@ -28,7 +28,8 @@
 	<link  rel="stylesheet" href="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.css">
 	<script src="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.js"></script>
 	<script src="http://cdn.jtsage.com/jtsage-datebox/i18n/jtsage-datebox.i18n.fi.utf8.min.js"></script>
-
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/additional-methods.min.js"></script>
 	
 	<style>
 		[data-role=page]{height: 100% !important; position:relative !important;}
@@ -56,6 +57,21 @@
 		}
 		.urlPoistaNappi{
 			float:left;
+		}
+		
+		.virhe {
+			color: red;
+		}
+		
+		label.errorL {
+		   /* color:red; */
+		   font-weight: bold;
+		}
+		
+		input.errorF {
+			border-bottom-color: red;
+			border-style: solid;
+			border-width: 0.2em;
 		}
 	</style>
 </head>
@@ -105,8 +121,6 @@
 				<a href="#kuvanValinta" class="ui-btn ui-corner-all ui-btn-inline ui-icon-arrow-r ui-btn-icon-right">Valitse kuva</a>
 				<a href="#peliSivu" class="ui-btn ui-corner-all ui-btn-inline ui-icon-navigation ui-btn-icon-right">Peli</a>
 			</div>
-			<a href="asdasdasd.html" data-ajax="false">asd</a>
-			<a href="lisaosa.html" data-ajax="false">dsa</a>
 		</div>
 
 		<div data-role="footer">
@@ -151,7 +165,7 @@
 				<label for="urlLahdeTeksti">URL (vain https://upload.wikimedia.org):</label>
 				<input name="urlLahdeTeksti" id="urlLahdeTeksti" value="" type="text">
 			</div>
-			<a href="#kuvanKatselu" id="urlKatso" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</a>
+			<button id="urlKatso" class="ui-btn ui-corner-all ui-btn-inline ui-icon-eye ui-btn-icon-right" data-rel="close" style="float:right">Katso kuvaa</button>
 		</div>	
 
 		<div data-role="footer">
@@ -174,7 +188,6 @@
 				<h3 id="lisaysViesti">Lisäys</h3>
 			</div>
 				
-			<form action="#" method="post" id="lisaaMatkatapahtumaLomake"> 
 			
                 <div class="ui-field-contain">
 					<label><img id="kuva" style="display:none" src="" alt="" width="100" height="100"></label>
@@ -187,37 +200,38 @@
 					<label for="automtiedot"> </label>
 					<button name="automtiedot" type="button" class="ui-btn ui-corner-all ui-btn-inline" id="automtiedot">Automaattiset tiedot</button>
                 </div>
+				<form id="rekisterointiForm">
+					<div class="ui-field-contain">
+						<label for="otsikko">Otsikko</label>
+						<input type="text" id="otsikko" name="otsikko" class="tarkastaOtsikko"> 
+					</div>
+					
+					<div class="ui-field-contain"> 
+						<label for="kuvaus">Kuvaus</label>
+						<textarea id="kuvaus" name="kuvaus"></textarea>
+					</div> 
+					
+					<div class="ui-field-contain">
+						<label for="paiva">Päivä</label>
+						<input name="paiva" id="paiva" type="text" class="tarkastaPaiva"/>
+					</div> 
 				
-                <div class="ui-field-contain">
-                    <label for="otsikko">Otsikko</label>
-                    <input type="text" id="otsikko" name="otsikko" class="tarkastaMatkatapahtumaOtsikko"> 
-                </div>
-				
-				<div class="ui-field-contain"> 
-                    <label for="kuvaus">Kuvaus</label>
-                    <textarea id="kuvaus" name="kuvaus"></textarea>
-                </div> 
-				
-                <div class="ui-field-contain">
-                    <label for="paiva">Päivä</label>
-                    <input name="paiva" id="paiva" type="text" />
-				</div> 
-			
-                <div class="ui-field-contain">
-                    <label for="paikka">Paikka</label>
-                    <input type="text" id="paikka" name="paikka">
-                </div>  
-                   
-                <div class="ui-field-contain">
-                    <label for="saa">Sää</label>
-                    <input type="text" id="saa" name="saa">
-                </div>  
+					<div class="ui-field-contain">
+						<label for="paikka">Paikka</label>
+						<input type="text" id="paikka" name="paikka">
+					</div>  
+					   
+					<div class="ui-field-contain">
+						<label for="saa">Sää</label>
+						<input type="text" id="saa" name="saa">
+					</div>  
 
-				<div class="ui-field-contain"> 
-					<button type="button" class="ui-btn ui-corner-all ui-btn-inline" id="lisaa" name="lisaa">Lisää</button>	
-					<a href="#" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-delete ui-btn-inline" id="tyhjenna" name="tyhjenna">Tyhjennä</a>	
-				</div>
-			</form> 
+					<div class="ui-field-contain"> 
+						<button type="button" class="ui-btn ui-corner-all ui-btn-inline ui-btn-icon-left ui-icon-plus" id="lisaa" name="lisaa">Lisää</button>	
+						<a href="#" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-delete ui-btn-inline" id="tyhjenna" name="tyhjenna">Tyhjennä</a>	
+					</div>
+				</form>
+
  
 		</div>
 		<!-- /content -->
@@ -393,6 +407,7 @@
 		});
 		
 		$(document).on("pagebeforeshow", "#kuvanKatselu", function() {
+			$('#kuvankatseludivi').empty();
 			$('#kuvankatseludivi').prepend('<img id="theImg" style="width:100%" src="'+imgsrc+'" />')
 			
 		});
@@ -514,6 +529,7 @@
 		
 			$("#urlKatso").on("tap", function() {
 				imgsrc=$("#urlLahdeTeksti").val();
+				$.mobile.pageContainer.pagecontainer("change", "#kuvanKatselu");
 			});
 		
 			$( "#kuvienListaus" ).show();
@@ -559,12 +575,16 @@
 			})
 
 			$("#lisaa").on("tap", function() {
-				tiedot.otsikko=$( "#otsikko" ).val();
-				tiedot.kuvaus=$( "#kuvaus" ).val();
-				tiedot.paiva=$( "#paiva" ).val();
-				tiedot.paikka=$( "#paikka" ).val();
-				tiedot.saa=$( "#saa" ).val();
-				lisaaKuva();
+				if ($("#rekisterointiForm").valid()) {
+					tiedot.otsikko=$( "#otsikko" ).val();
+					tiedot.kuvaus=$( "#kuvaus" ).val();
+					tiedot.paiva=$( "#paiva" ).val();
+					tiedot.paikka=$( "#paikka" ).val();
+					tiedot.saa=$( "#saa" ).val();
+					lisaaKuva();
+					$.mobile.pageContainer.pagecontainer("change", "#etusivu");
+				}
+				
 
 			})
 			
@@ -600,12 +620,49 @@
 			
 		});
 		
+		var validator = $("#rekisterointiForm").validate({	
+	
+			errorClass: "virhe",				
+			rules: {
+				otsikko:  {
+					required: true,
+				},	
+				paiva:  {
+					required: true,
+				},
+			},
+			messages: {
+				otsikko: {
+					required: "Pakollinen",
+				},
+				paiva: {
+					required: "Pakollinen",
+				},
+			},
+			highlight: function(element) {
+				$(element).addClass('errorF');
+				$(element.form).find("label[for=" + element.id + "]").addClass("errorL");
+			}, 
+			unhighlight: function(element) {
+				$(element).removeClass('errorF');
+				$(element.form).find("label[for=" + element.id + "]").removeClass("errorL");
+			},
+			errorPlacement: function(error, element ) {
+				error.insertAfter(element.parent());
+			},
+			submitHandler: function (form) {
+
+			},
+		
+		})
+		
 		function tyhjenna(){
 			$( "#otsikko" ).val("");
 			$( "#paiva" ).val("");
 			$( "#paikka" ).val("");
 			$( "#saa" ).val("");
 			$( "#kuvaus" ).val("");
+			validator.resetForm();
 		}
 		
 		function lisaaKuva() {
@@ -667,13 +724,15 @@
 					var cursor = event.target.result;
 					
 					if(cursor){
-						html+=	"<li>"+cursor.value.otsikko+", "+
+						html+=	"<li>"+
+								'<img src="data:image/jpeg;base64,'+cursor.value.fileURL+'" alt="" width="100" height="100">'+
+								cursor.value.otsikko+", "+
 								cursor.value.kuvaus+", "+
 								cursor.value.paikka+", "+
 								cursor.value.paiva+", "+
 								cursor.value.saa+
 								"<span class='urlPoistaNappi'><button otsikko='"+cursor.value.otsikko+"' paiva='"+cursor.value.paiva+"' class='poistonappi ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext'>asd</button></span>"+
-								"<span class='urlKatsoNappi'><button linkki='"+cursor.value.otsikko+"' class='nappi ui-btn ui-corner-all ui-icon-eye ui-btn-icon-notext'>asd</button></span>"+
+								"<span class='urlKatsoNappi'><button linkki='"+cursor.value.fileURL+"' class='nappi ui-btn ui-corner-all ui-icon-eye ui-btn-icon-notext'>asd</button></span>"+
 								"</li>";
 						cursor.continue();
 					}
@@ -686,7 +745,9 @@
 					}
 					$(".nappi").each(function( index ) {
 						$( this ).on("tap", function() {				
-							console.log($( this ).attr('linkki'));
+							var asd = 'data:image/jpeg;base64,'+$( this ).attr('linkki');
+							imgsrc = asd;
+							$.mobile.pageContainer.pagecontainer("change", "#kuvanKatselu");
 						});
 					});
 					$(".poistonappi").each(function( index ) {
@@ -745,6 +806,7 @@
 				}
 						
 				transaction.oncomplete = function(event) {
+					$("#kuvienListaus").html("").listview("refresh");
 					listaaKuvat();
 				}
 					
@@ -798,7 +860,7 @@
 			console.log(kuva);
 		}
 
-		
+		var fileURL = "";
 		function kameraValmis() {
 			$( "#otaKuva" ).prop( "disabled", false );
 			$( "#lataaKuva").prop( "disabled", false );
@@ -824,6 +886,7 @@
 				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData);  // kun DATA_URL
 				$( "#kuva").show();
 				fileURL = imageData;
+				tiedot.fileURL = imageData;
 			}
 			
 			function onLoadSuccess(imageData) {
@@ -831,6 +894,7 @@
 				$("#kuva").attr("src", "data:image/jpeg;base64," + imageData); // kun DATA_URL
 				$("#kuva").show();
 				fileURL = imageData;
+				tiedot.fileURL = imageData;
 			}
 			
 			function onError() {
