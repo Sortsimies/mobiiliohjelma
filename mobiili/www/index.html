@@ -13,23 +13,20 @@
 	
 	<link rel="stylesheet" href="themes/siniteema.css" />
   <link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile.structure-1.4.5.min.css" /> 
+  <link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" /> 
 	
-	<script
-	src="https://code.jquery.com/jquery-2.1.4.js"
-	integrity="sha256-siFczlgw4jULnUICcdm9gjQPZkw/YPDqhQ9+nAOScE4="
-	crossorigin="anonymous"></script>
+	<script	src="js/jquery-2.1.4.js"></script>
 	
 	<script 
-   src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+   src="js/jquery.mobile-1.4.5.min.js"></script>
 
     <title>Mobiiliohjelmointi</title>
 	
-	<link  rel="stylesheet" href="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.css">
-	<script src="http://cdn.jtsage.com/jtsage-datebox/4.0.0/jtsage-datebox-4.0.0.jqm.min.js"></script>
-	<script src="http://cdn.jtsage.com/jtsage-datebox/i18n/jtsage-datebox.i18n.fi.utf8.min.js"></script>
-	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/jquery.validate.min.js"></script>
-	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.15.0/additional-methods.min.js"></script>
+	<link  rel="stylesheet" href="css/jtsage-datebox-4.0.0.jqm.min.css">
+	<script src="js/jtsage-datebox-4.0.0.jqm.min.js"></script>
+	<script src="js/jtsage-datebox.i18n.fi.utf8.min.js"></script>
+	<script src="js/jquery.validate.min.js"></script>
+	<script src="js/additional-methods.min.js"></script>
 	
 	<style>
 		[data-role=page]{height: 100% !important; position:relative !important;}
@@ -177,7 +174,7 @@
 	
 	
 	
-	<div data-role="page" id="uusi" data-title="Uusi matkatapahtuma">
+	<div data-role="page" id="uusi">
 		<div data-role="header">
 			<a href="#etusivu" class="ui-btn ui-corner-all ui-icon-home ui-btn-icon-notext">Etusivu</a>
 			<h1>Uusi kuva</h1>
@@ -657,6 +654,7 @@
 		})
 		
 		function tyhjenna(){
+			$( "#kuva" ).attr("src","");
 			$( "#otsikko" ).val("");
 			$( "#paiva" ).val("");
 			$( "#paikka" ).val("");
